@@ -11,14 +11,14 @@
 
 // Pravi podrazumevani veliki broj (nula)
 BigDecimal::BigDecimal() :
-	sign(false), digits(new digit[1]), length(1), dot(1)
+	neg(false), digits(new digit[1]), length(1), dot(1)
 {
 	*digits = 0;
 }
 
 // Pravi veliki broj od celog broja
 BigDecimal::BigDecimal(int num) :
-	sign(num < 0)
+	neg(num < 0)
 {
 	num = std::abs(num);
 	// broj cifara num = ⌊log₁₀(num)⌋ + 1
@@ -39,7 +39,7 @@ BigDecimal::BigDecimal(const char* num)
 		throw std::invalid_argument("num cannot be an empty string");
 
 	// Određuje znak
-	sign = *num == '-';
+	neg = *num == '-';
 
 	// Izostavlja znak i vodeće nule
 	for (; strChr("+-0", *num); ++num, --length);
@@ -73,24 +73,24 @@ BigDecimal::BigDecimal(const char* num)
 
 	// Sprečava -0
 	if (isZero())
-		sign = false;
+		neg = false;
 }
 
 // Uslužni konstruktor: pravi veliki broj prepisivanjem datih podataka
-BigDecimal::BigDecimal(bool sign, const digit* digits, count length, count dot) :
-	sign(sign), digits(new digit[length]), length(length), dot(dot)
+BigDecimal::BigDecimal(bool neg, const digit* digits, count length, count dot) :
+	neg(neg), digits(new digit[length]), length(length), dot(dot)
 {
 	copyDigits(this->digits, digits, length);
 }
 
 // Pravi veliki broj kopiranjem
 BigDecimal::BigDecimal(const BigDecimal& other) :
-	BigDecimal(other.sign, other.digits, other.length, other.dot)  // Uslužni
+	BigDecimal(other.neg, other.digits, other.length, other.dot)  // Uslužni
 {}
 
 // Pravi veliki broj premeštanjem
 BigDecimal::BigDecimal(BigDecimal&& other) :
-	sign(other.sign), digits(other.digits), length(other.length), dot(other.dot)
+	neg(other.neg), digits(other.digits), length(other.length), dot(other.dot)
 {
 	other.digits = nullptr;
 }
@@ -118,7 +118,7 @@ BigDecimal& BigDecimal::operator=(BigDecimal other)
 void swap(BigDecimal& first, BigDecimal& second)
 {
 	using std::swap;
-	swap(first.sign,   second.sign);
+	swap(first.neg,    second.neg);
 	swap(first.digits, second.digits);
 	swap(first.length, second.length);
 	swap(first.dot,    second.dot);
@@ -141,7 +141,7 @@ BigDecimal BigDecimal::shl(count n) const
 
 	// Ako se tačka pomera samo unutar postojećih cifara, odmah vrati novi
 	if (rdot > 0)
-		return BigDecimal(sign, digits, length, rdot);
+		return BigDecimal(neg, digits, length, rdot);
 
 	// U suprotnom treba proširiti niz nulama s leve strane
 	auto zeros = -rdot + 1;
@@ -155,7 +155,7 @@ BigDecimal BigDecimal::shl(count n) const
 	// Prepisuje postojeće cifre
 	copyDigits(rdigits+zeros, digits, length);
 
-	auto&& result = BigDecimal(sign, rdigits, rlength, 1);
+	auto&& result = BigDecimal(neg, rdigits, rlength, 1);
 	delete rdigits;  // Briše pomoćni niz
 	return result;
 }
@@ -184,7 +184,7 @@ BigDecimal BigDecimal::shr(count n) const
 	for (; rlength < rdot; ++rlength)
 		rdigits[rlength] = 0;
 	
-	auto&& result = BigDecimal(sign, rdigits, rlength, rdot);
+	auto&& result = BigDecimal(neg, rdigits, rlength, rdot);
 	delete rdigits;  // Briše pomoćni niz
 	return result;
 }
@@ -255,7 +255,7 @@ bool BigDecimal::less(const BigDecimal* other) const
 // Ispituje da li je broj jednak drugom
 bool BigDecimal::equals(const BigDecimal* other) const
 {
-	if (sign != other->sign || length != other->length || dot != other->dot)
+	if (neg != other->neg || length != other->length || dot != other->dot)
 		return false;
 
 	for (count i = 0; i < length; ++i)
@@ -272,13 +272,13 @@ bool BigDecimal::equals(const BigDecimal* other) const
 // Ispituje da li je broj negativan
 bool BigDecimal::isNegative() const
 {
-	return sign;
+	return neg;
 }
 
 // Ispituje da li je broj pozitivan
 bool BigDecimal::isPositive() const
 {
-	return !sign && !isZero();
+	return !neg && !isZero();
 }
 
 // Ispituje da li je broj nula
@@ -298,7 +298,7 @@ BigDecimal BigDecimal::abs() const
 }
 
 // Vraća vrednost sa suprotnim znakom kao novi broj
-BigDecimal BigDecimal::neg() const
+BigDecimal BigDecimal::negate() const
 {
 	return BigDecimal(isPositive(), digits, length, dot);
 }
