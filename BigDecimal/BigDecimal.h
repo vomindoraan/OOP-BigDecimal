@@ -88,7 +88,7 @@ private:
 	 *  Atributi  *
 	 *------------*/
 
-	char   sign;    // Znak broja ('+' ili '-')
+	bool   sign;    // Znak broja (false=+, true=-)
 	digit* digits;  // Niz značajnih cifara (bez decimalne tačke)
 	count  length;  // Dužina niza
 	count  dot;     // Mesto tačke (broj cifara ispred nje), uvek ≥1
@@ -98,7 +98,7 @@ private:
 	 *------------------*/
 
 	// Uslužni konstruktor
-	BigDecimal(char sign, const digit* digits, count length, count dot);
+	BigDecimal(bool sign, const digit* digits, count length, count dot);
 
 	// Uslužne funkcije za rad sa ciframa
 	static void  numToDigits(digit* dst, count len, count num);

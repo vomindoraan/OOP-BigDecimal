@@ -11,14 +11,14 @@
 
 // Pravi podrazumevani veliki broj (nula)
 BigDecimal::BigDecimal() :
-	sign('+'), digits(new digit[1]), length(1), dot(1)
+	sign(false), digits(new digit[1]), length(1), dot(1)
 {
 	*digits = 0;
 }
 
 // Pravi veliki broj od celog broja
 BigDecimal::BigDecimal(int num) :
-	sign(num < 0 ? '-' : '+')
+	sign(num < 0)
 {
 	num = std::abs(num);
 	// broj cifara num = ⌊log₁₀(num)⌋ + 1
@@ -39,7 +39,7 @@ BigDecimal::BigDecimal(const char* num)
 		throw std::invalid_argument("num cannot be an empty string");
 
 	// Određuje znak
-	sign = (*num == '-') ? '-' : '+';
+	sign = *num == '-';
 
 	// Izostavlja znak i vodeće nule
 	for (; strChr("+-0", *num); ++num, --length);
@@ -73,11 +73,11 @@ BigDecimal::BigDecimal(const char* num)
 
 	// Sprečava -0
 	if (isZero())
-		sign = '+';
+		sign = false;
 }
 
 // Uslužni konstruktor: pravi veliki broj prepisivanjem datih podataka
-BigDecimal::BigDecimal(char sign, const digit* digits, count length, count dot) :
+BigDecimal::BigDecimal(bool sign, const digit* digits, count length, count dot) :
 	sign(sign), digits(new digit[length]), length(length), dot(dot)
 {
 	copyDigits(this->digits, digits, length);
@@ -272,13 +272,13 @@ bool BigDecimal::equals(const BigDecimal* other) const
 // Ispituje da li je broj negativan
 bool BigDecimal::isNegative() const
 {
-	return sign == '-';
+	return sign;
 }
 
 // Ispituje da li je broj pozitivan
 bool BigDecimal::isPositive() const
 {
-	return sign == '+' && !isZero();
+	return !sign && !isZero();
 }
 
 // Ispituje da li je broj nula
@@ -294,13 +294,13 @@ bool BigDecimal::isZero() const
 // Vraća apsolutnu vrednost kao novi broj
 BigDecimal BigDecimal::abs() const
 {
-	return BigDecimal('+', digits, length, dot);
+	return BigDecimal(false, digits, length, dot);
 }
 
 // Vraća vrednost sa suprotnim znakom kao novi broj
 BigDecimal BigDecimal::neg() const
 {
-	return BigDecimal(isPositive() ? '-' : '+', digits, length, dot);
+	return BigDecimal(isPositive(), digits, length, dot);
 }
 
 /*---------------*
