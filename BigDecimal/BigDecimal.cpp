@@ -187,19 +187,25 @@ BigDecimal BigDecimal::rmd(count* n) const
  *  Sabiranje i oduzimanje  *
  *--------------------------*/
 
+// Zajednička priprema podataka za sabiranje i oduzimanje
+#define PREPARE(this, other)                            \
+	count tn, on;                                       \
+	auto trmd = this->rmd(&tn), ormd = other->rmd(&on); \
+                                                        \
+    /* Poravnava oba broja na najnižu cifru */          \
+	auto n = std::max(tn, on);                          \
+	auto tshr = trmd.shr(n-tn), oshr = ormd.shr(n-on);  \
+                                                        \
+	/* Podaci rezultujućeg broja */                     \
+	auto rlength = std::max(tshr.length, oshr.length);  \
+	auto rdot = std::max(this->dot, other->dot);        \
+	auto rdigits = new digit[rlength];                  \
+	digit carry = 0;                                    \
+
 // Sabira drugi broj sa ovim i vraća zbir kao novi broj
 BigDecimal BigDecimal::add(const BigDecimal* other) const
 {
-	count tn, on;
-	auto trmd = this->rmd(&tn), ormd = other->rmd(&on);
-
-	auto n = std::max(tn, on);  // Veći od dva pomeraja udesno
-	auto tshr = trmd.shr(n-tn), oshr = ormd.shr(n-on);
-
-	auto rlength = std::max(tshr.length, oshr.length);
-	auto rdot    = std::max(this->dot,   other->dot);
-	auto rdigits = new digit[rlength];
-	digit carry = 0;
+	PREPARE(this, other)
 
 	// Popunjava rezultujući niz sabirajući cifre otpozadi i pamteći prenos
 	for (count t = tshr.length-1, o = oshr.length-1, r = rlength-1;
@@ -230,18 +236,9 @@ BigDecimal BigDecimal::add(const BigDecimal* other) const
 // Oduzima drugi broj od ovog i vraća razliku kao novi broj
 BigDecimal BigDecimal::sub(const BigDecimal* other) const
 {
-	count tn, on;
-	auto trmd = this->rmd(&tn), ormd = other->rmd(&on);
+	PREPARE(this, other)
 
-	auto n = std::max(tn, on);  // Veći od dva pomeraja udesno
-	auto tshr = trmd.shr(n-tn), oshr = ormd.shr(n-on);
-
-	auto rlength = std::max(tshr.length, oshr.length);
-	auto rdot    = std::max(this->dot,   other->dot);
-	auto rdigits = new digit[rlength];
-	digit carry = 0;
-
-	// Popunjava rezultujući niz sabirajući cifre otpozadi i pamteći prenos
+	// Popunjava rezultujući niz oduzimajući cifre otpozadi i pamteći prenos
 	for (count t = tshr.length-1, o = oshr.length-1, r = rlength-1;
 	     r >= 0; --t, --o, --r)
 	{
