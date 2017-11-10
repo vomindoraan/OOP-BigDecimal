@@ -205,6 +205,23 @@ BigDecimal BigDecimal::rmd(count* n) const
 // Sabira drugi broj sa ovim i vraća zbir kao novi broj
 BigDecimal BigDecimal::add(const BigDecimal* other) const
 {
+	if (isZero())
+		return *other;
+	if (other->isZero())
+		return *this;
+
+	char rsign;
+	if (isPositive() && other->isPositive())
+		rsign = '+';
+	else if (isNegative() && other->isNegative())
+		rsign = '-';
+	else {
+		auto ta = this->abs(), oa = other->abs();
+		auto&& result = ta.greater(&oa) ? ta.sub(&oa) : oa.sub(&ta);
+		rsign = ta.greater(&oa) ? this->sign : other->sign;
+		return BigDecimal(rsign, result.digits, result.length, result.dot);
+	}
+
 	PREPARE(this, other)
 
 	// Popunjava rezultujući niz sabirajući cifre otpozadi i pamteći prenos
@@ -228,7 +245,7 @@ BigDecimal BigDecimal::add(const BigDecimal* other) const
 		delete[] old;
 	}
 
-	auto&& result = BigDecimal(sign, rdigits, rlength, rlength);
+	auto&& result = BigDecimal(rsign, rdigits, rlength, rlength);
 	delete[] rdigits;
 	return result.shl(n);  // Pomeranje ulevo vraća tačku na mesto
 }
