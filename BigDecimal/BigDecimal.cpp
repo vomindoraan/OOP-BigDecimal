@@ -99,6 +99,7 @@ BigDecimal::~BigDecimal()
 {
 	delete[] digits;
 	digits = nullptr;
+	length = dot = 0;
 }
 
 /*-----------------------------*
@@ -117,9 +118,9 @@ BigDecimal BigDecimal::shl(count n) const
 	auto rdot = dot - n;
 
 	// Ako se broj završava nulom, treba ukloniti pratećih ≤n nula
-	const auto* p = digits + length - 1;
+	const auto* end = digits + length - 1;
 	auto rlength = length;
-	for (; *p == 0 && n-- > 0; --p, --rlength);
+	for (; *end == 0 && n > 0; --end, --n, --rlength);
 
 	// Ako se tačka pomera samo unutar postojećih cifara, odmah vrati novi
 	if (rdot > 0)
@@ -135,9 +136,8 @@ BigDecimal BigDecimal::shl(count n) const
 
 	// Prepisuje postojeće cifre
 	copyDigits(rdigits+zeros, digits, rlength);
-	rlength += zeros;  // Uvećava dužinu za taj broj nula
 
-	auto&& result = BigDecimal(sign, rdigits, rlength, 1);
+	auto&& result = BigDecimal(sign, rdigits, rlength+zeros, 1);
 	delete[] rdigits;  // Briše pomoćni niz
 	return result;
 }
@@ -152,15 +152,15 @@ BigDecimal BigDecimal::shr(count n) const
 		return *this;
 
 	// Ako broj počinje nulom, treba ukloniti vodećih ≤n nula
-	const auto* p = digits;
+	const auto* start = digits;
 	auto rlength = length;
-	for (; *p == 0 && n-- > 0; ++p, --rlength);
+	for (; *start == 0 && n > 0; ++start, --n, --rlength);
 
 	auto rdot = dot + n;
 	auto* rdigits = new digit[std::max(rlength, rdot)];  // Pravi pomoćni niz
 
 	// Prepisuje postojeće cifre
-	copyDigits(rdigits, p, rlength);
+	copyDigits(rdigits, start, rlength);
 
 	// Ako je pomereno dalje od poslednje cifre, dopisuje prateće nule na kraj
 	for (; rlength < rdot; ++rlength)
@@ -214,11 +214,12 @@ BigDecimal BigDecimal::add(const BigDecimal* other) const
 
 	// Ako je ostao prenos, treba proširiti niz za još jednu cifru
 	if (carry > 0) {
-		auto expanded = new digit[rlength+1];
-		*expanded = carry;  // Prva cifra je prenos
-		copyDigits(expanded+1, rdigits, rlength);  // Ostale se prepisuju
+		auto* old = rdigits;
+		rdigits = new digit[rlength+1];
+		*rdigits = carry;
+		copyDigits(rdigits+1, old, rlength);
 		++rlength, ++rdot;  // Uvećava dužinu za tu jednu cifru
-		delete[] rdigits, rdigits = expanded;
+		delete[] old;
 	}
 
 	auto&& result = BigDecimal(sign, rdigits, rlength, rlength);
@@ -245,12 +246,11 @@ bool BigDecimal::greater(const BigDecimal *other) const
 // Ispituje da li je broj manji od drugog
 bool BigDecimal::less(const BigDecimal* other) const
 {
-	if (isZero() && other->isZero())
-		return false;
-	if ((isNegative() || isZero()) && (other->isPositive() || other->isZero()))
-		return true;
 	if ((isPositive() || isZero()) && (other->isNegative() || other->isZero()))
 		return false;
+	if (isNegative() && (other->isPositive() || other->isZero()) ||
+			isZero() &&  other->isPositive())
+		return true;
 
 	if (dot > other->dot)
 		return isNegative();  // Negativan ima više cifara → manji je
