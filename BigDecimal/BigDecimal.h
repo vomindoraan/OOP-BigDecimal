@@ -22,6 +22,9 @@ public:
 	BigDecimal(BigDecimal&& other);
 	~BigDecimal();
 
+	// Zabrana dodele
+	BigDecimal& operator=(const BigDecimal&) = delete;
+
 	// Pomeranje decimalne tačke
 	BigDecimal shl(count n)          const;
 	BigDecimal shr(count n)          const;
