@@ -60,7 +60,7 @@ public:
 	bool isZero()     const;
 
 	// Suprotna vrednost
-	BigDecimal neg() const;
+	BigDecimal negate() const;
 
 	// Operatori za pomeranje tačke
 	BigDecimal operator<<(count n) const { return shl(n); }
@@ -80,15 +80,15 @@ public:
 	bool operator<=(const BigDecimal& bd) const { return less(&bd)    || equals(&bd); }
 
 	// Operatori za promenu znaka
-	BigDecimal operator+() const { return abs(); }
-	BigDecimal operator-() const { return neg(); }
+	BigDecimal operator+() const { return abs();    }
+	BigDecimal operator-() const { return negate(); }
 
 private:
 	/*------------*
 	 *  Atributi  *
 	 *------------*/
 
-	char   sign;    // Znak broja ('+' ili '-')
+	bool   neg;     // Da li je negativan
 	digit* digits;  // Niz značajnih cifara (bez decimalne tačke)
 	count  length;  // Dužina niza
 	count  dot;     // Mesto tačke (broj cifara ispred nje), uvek ≥1
@@ -98,7 +98,7 @@ private:
 	 *------------------*/
 
 	// Uslužni konstruktor
-	BigDecimal(char sign, const digit* digits, count length, count dot);
+	BigDecimal(bool neg, const digit* digits, count length, count dot);
 
 	// Uslužne funkcije za rad sa ciframa
 	static void  numToDigits(digit* dst, count len, count num);
