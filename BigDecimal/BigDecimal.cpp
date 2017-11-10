@@ -267,7 +267,7 @@ BigDecimal BigDecimal::sub(const BigDecimal* other) const
 	}
 	if (oa.greater(&ta)) {
 		auto&& result = oa.sub(&ta);
-		return BigDecimal(other->neg, result.digits, result.length, result.dot);
+		return BigDecimal(!this->neg, result.digits, result.length, result.dot);
 	}
 
 	PREPARE(this, other)
