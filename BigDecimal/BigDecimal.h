@@ -52,6 +52,7 @@ public:
 	// Dodatni konstruktori
 	BigDecimal();
 	BigDecimal(int num);
+	BigDecimal(double) = delete;
 
 	// Ispitivanje znaka
 	bool isNegative() const;
