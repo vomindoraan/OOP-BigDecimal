@@ -310,7 +310,7 @@ BigDecimal BigDecimal::neg() const
 // Ispisuje veliki broj na izlazni tok po formatu: [-]ceo[.razlomljen]
 std::ostream& operator<<(std::ostream& os, const BigDecimal& bd)
 {
-	if (bd.sign == '-')
+	if (bd.isNegative())
 		os << '-';
 	for (count i = 0; i < bd.length; ++i) {
 		if (i == bd.dot)
