@@ -149,7 +149,7 @@ BigDecimal BigDecimal::shr(count n) const
 	// Ako broj počinje nulom, treba ukloniti vodećih ≤n nula
 	const auto* p = digits;
 	auto rlength = length;
-	for (; *p == 0 && --n > 0; ++p, --rlength);  // Usput smanjuje dužinu
+	for (; *p == 0 && n-- > 0; ++p, --rlength);  // Usput smanjuje dužinu
 
 	auto rdot = dot + n;
 	auto* rdigits = new digit[std::max(rlength, rdot)];  // Pravi pomoćni niz
@@ -169,12 +169,12 @@ BigDecimal BigDecimal::shr(count n) const
 // Vraća novi broj sa uklonjenom tačkom (pamti za koliko je pomerena udesno u n)
 BigDecimal BigDecimal::rmd(count* n) const
 {
-	auto oldDot = dot;
+	auto oldLength = length, oldDot = dot;
 	auto scale = length - dot;  // Broj decimala iza tačke
 	auto&& result = shr(scale);
 
 	if (n != nullptr)
-		*n = result.dot - oldDot;
+		*n = oldLength - result.length + result.dot - oldDot;
 	return result;
 }
 
