@@ -80,6 +80,8 @@ BigDecimal::BigDecimal(char sign, const digit* digits, count length, count dot) 
 	sign(sign), digits(new digit[length]), length(length), dot(dot)
 {
 	copyDigits(this->digits, digits, length);
+	if (isZero())
+		this->sign = '+';
 }
 
 // Pravi veliki broj kopiranjem
@@ -253,6 +255,21 @@ BigDecimal BigDecimal::add(const BigDecimal* other) const
 // Oduzima drugi broj od ovog i vraća razliku kao novi broj
 BigDecimal BigDecimal::sub(const BigDecimal* other) const
 {
+	if (isZero())
+		return other->neg();
+	if (other->isZero())
+		return *this;
+
+	auto ta = this->abs(), oa = other->abs();
+	if (this->sign != other->sign) {
+		auto&& result = ta.add(&oa);
+		return BigDecimal(this->sign, result.digits, result.length, result.dot);
+	}
+	if (oa.greater(&ta)) {
+		auto&& result = oa.sub(&ta);
+		return BigDecimal(other->sign, result.digits, result.length, result.dot);
+	}
+
 	PREPARE(this, other)
 
 	// Popunjava rezultujući niz oduzimajući cifre otpozadi i pamteći prenos
@@ -270,7 +287,7 @@ BigDecimal BigDecimal::sub(const BigDecimal* other) const
 	auto *start = rdigits;
 	for (; *start == 0 && rlength > 1; ++start, --rlength, --rdot);
 
-	auto&& result = BigDecimal(sign, start, rlength, rlength);
+	auto&& result = BigDecimal(this->sign, start, rlength, rlength);
 	delete[] rdigits;
 	return result.shl(n);  // Pomeranje ulevo vraća tačku na mesto
 }
