@@ -116,21 +116,26 @@ BigDecimal BigDecimal::shl(count n) const
 
 	auto rdot = dot - n;
 
+	// Ako se broj završava nulom, treba ukloniti pratećih ≤n nula
+	const auto* p = digits + length - 1;
+	auto rlength = length;
+	for (; *p == 0 && n-- > 0; --p, --rlength);
+
 	// Ako se tačka pomera samo unutar postojećih cifara, odmah vrati novi
 	if (rdot > 0)
-		return BigDecimal(sign, digits, length, rdot);
+		return BigDecimal(sign, digits, rlength, rdot);
 
 	// U suprotnom treba proširiti niz nulama s leve strane
 	auto zeros = -rdot + 1;
-	auto rlength = length + zeros;
-	auto* rdigits = new digit[rlength];
+	auto* rdigits = new digit[rlength+zeros];  // Pravi pomoćni niz
 
 	// Upisuje vodeće nule na početak
 	for (count i = 0; i < zeros; ++i)
 		rdigits[i] = 0;
 
 	// Prepisuje postojeće cifre
-	copyDigits(rdigits+zeros, digits, length);
+	copyDigits(rdigits+zeros, digits, rlength);
+	rlength += zeros;  // Uvećava dužinu za taj broj nula
 
 	auto&& result = BigDecimal(sign, rdigits, rlength, 1);
 	delete[] rdigits;  // Briše pomoćni niz
@@ -149,7 +154,7 @@ BigDecimal BigDecimal::shr(count n) const
 	// Ako broj počinje nulom, treba ukloniti vodećih ≤n nula
 	const auto* p = digits;
 	auto rlength = length;
-	for (; *p == 0 && n-- > 0; ++p, --rlength);  // Usput smanjuje dužinu
+	for (; *p == 0 && n-- > 0; ++p, --rlength);
 
 	auto rdot = dot + n;
 	auto* rdigits = new digit[std::max(rlength, rdot)];  // Pravi pomoćni niz
