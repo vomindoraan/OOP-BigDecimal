@@ -230,7 +230,35 @@ BigDecimal BigDecimal::add(const BigDecimal* other) const
 // Oduzima drugi broj od ovog i vraća razliku kao novi broj
 BigDecimal BigDecimal::sub(const BigDecimal* other) const
 {
-	return {};  // TODO
+	count tn, on;
+	auto trmd = this->rmd(&tn), ormd = other->rmd(&on);
+
+	auto n = std::max(tn, on);  // Veći od dva pomeraja udesno
+	auto tshr = trmd.shr(n-tn), oshr = ormd.shr(n-on);
+
+	auto rlength = std::max(tshr.length, oshr.length);
+	auto rdot    = std::max(this->dot,   other->dot);
+	auto rdigits = new digit[rlength];
+	digit carry = 0;
+
+	// Popunjava rezultujući niz sabirajući cifre otpozadi i pamteći prenos
+	for (count t = tshr.length-1, o = oshr.length-1, r = rlength-1;
+	     r >= 0; --t, --o, --r)
+	{
+		auto sum = (t >= 0 ? tshr.digits[t] : 0)
+		         - (o >= 0 ? oshr.digits[o] : 0)
+		         - carry;
+		rdigits[r] = (sum + 10) % 10;
+		carry      =  sum < 0;
+	}
+
+	// Uklanja vodeće nule
+	auto *start = rdigits;
+	for (; *start == 0 && rlength > 1; ++start, --rlength, --rdot);
+
+	auto&& result = BigDecimal(sign, start, rlength, rlength);
+	delete[] rdigits;
+	return result.shl(n);  // Pomeranje ulevo vraća tačku na mesto
 }
 
 /*-------------*
