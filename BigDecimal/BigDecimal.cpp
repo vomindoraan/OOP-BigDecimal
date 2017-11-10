@@ -361,7 +361,7 @@ void BigDecimal::copyDigits(digit* dst, const char* src, count len)
  *------------------------------*/
 
 // Traži prvo pojavljivanje znaka u stringu
-const char* BigDecimal::strChr(const char* str, char chr)
+const char* BigDecimal::strChr(const char* str, int chr)
 {
 	for (; *str && *str != chr; ++str);
 	return *str ? str : nullptr;

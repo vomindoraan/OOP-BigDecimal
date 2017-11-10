@@ -107,7 +107,7 @@ private:
 	static void  copyDigits (digit* dst, const char*  src, count len);
 
 	// Neke funkcije iz <cstring>
-	static const char* strChr(const char* str, char chr);
+	static const char* strChr(const char* str, int chr);
 	static size_t      strLen(const char* str);
 };
 
