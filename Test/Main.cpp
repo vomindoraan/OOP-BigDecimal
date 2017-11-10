@@ -41,9 +41,9 @@ void test()
 		}
 
 	BigDecimal zero;
-	BigDecimal fourtyTwo = 42;
-	std::cout << zero << " " << fourtyTwo << " " << (zero <= fourtyTwo) << "\n";
-	std::cout << (zero == 0) << " " << (fourtyTwo >= 0) << "\n";
+	BigDecimal fortyTwo = 42;
+	std::cout << zero << " " << fortyTwo << " " << (zero <= fortyTwo) << "\n";
+	std::cout << (zero == 0) << " " << (fortyTwo >= 0) << "\n";
 }
 #endif  // STUDENT_TEST
 
