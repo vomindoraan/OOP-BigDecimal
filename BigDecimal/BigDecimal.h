@@ -22,10 +22,6 @@ public:
 	BigDecimal(BigDecimal&& other);
 	~BigDecimal();
 
-	// Dodela vrednosti
-	BigDecimal& operator=(BigDecimal other);
-	friend void swap(BigDecimal& first, BigDecimal& second);
-
 	// Pomeranje decimalne tačke
 	BigDecimal shl(count n)          const;
 	BigDecimal shr(count n)          const;

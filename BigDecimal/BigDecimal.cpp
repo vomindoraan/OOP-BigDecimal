@@ -2,7 +2,6 @@
 
 #include <algorithm>  // max, min
 #include <stdexcept>  // invalid_argument
-#include <utility>    // swap
 #include <cmath>      // abs, log10
 
 /*---------------------------*
@@ -100,28 +99,6 @@ BigDecimal::~BigDecimal()
 {
 	delete[] digits;
 	digits = nullptr;
-}
-
-/*--------------------*
- *  Dodela vrednosti  *
- *--------------------*/
-
-// Dodeljuje velike brojeve po copy-and-swap idiomu
-// https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
-BigDecimal& BigDecimal::operator=(BigDecimal other)
-{
-	swap(*this, other);
-	return *this;
-}
-
-// Razmenjuje vrednosti dvaju velikih brojeva
-void swap(BigDecimal& first, BigDecimal& second)
-{
-	using std::swap;
-	swap(first.sign,   second.sign);
-	swap(first.digits, second.digits);
-	swap(first.length, second.length);
-	swap(first.dot,    second.dot);
 }
 
 /*-----------------------------*
