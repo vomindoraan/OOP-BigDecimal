@@ -141,7 +141,7 @@ BigDecimal BigDecimal::shl(count n) const
 
 	// Ako se tačka pomera samo unutar postojećih cifara, odmah vrati novi
 	if (rdot > 0)
-		return BigDecimal{sign, digits, length, rdot};
+		return BigDecimal(sign, digits, length, rdot);
 
 	// U suprotnom treba proširiti niz nulama s leve strane
 	auto zeros = -rdot + 1;
@@ -155,7 +155,7 @@ BigDecimal BigDecimal::shl(count n) const
 	// Prepisuje postojeće cifre
 	copyDigits(rdigits+zeros, digits, length);
 
-	auto&& result = BigDecimal{sign, rdigits, rlength, 1};
+	auto&& result = BigDecimal(sign, rdigits, rlength, 1);
 	delete rdigits;  // Briše pomoćni niz
 	return result;
 }
@@ -184,7 +184,7 @@ BigDecimal BigDecimal::shr(count n) const
 	for (; rlength < rdot; ++rlength)
 		rdigits[rlength] = 0;
 	
-	auto&& result = BigDecimal{sign, rdigits, rlength, rdot};
+	auto&& result = BigDecimal(sign, rdigits, rlength, rdot);
 	delete rdigits;  // Briše pomoćni niz
 	return result;
 }
@@ -294,13 +294,13 @@ bool BigDecimal::isZero() const
 // Vraća apsolutnu vrednost kao novi broj
 BigDecimal BigDecimal::abs() const
 {
-	return BigDecimal{'+', digits, length, dot};
+	return BigDecimal('+', digits, length, dot);
 }
 
 // Vraća vrednost sa suprotnim znakom kao novi broj
 BigDecimal BigDecimal::neg() const
 {
-	return BigDecimal{isPositive() ? '-' : '+', digits, length, dot};
+	return BigDecimal(isPositive() ? '-' : '+', digits, length, dot);
 }
 
 /*---------------*
