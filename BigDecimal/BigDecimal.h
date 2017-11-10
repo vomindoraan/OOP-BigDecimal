@@ -4,10 +4,10 @@
 #include <iostream>
 
 using digit = signed char;  // Cifra: jednobajtni ceo broj
-#ifdef PROF_TEST
-using count = int;          // Broj cifara: kompatibilno s potpisom rmd(int*)
-#else
+#ifdef _WIN64
 using count = long long;    // Broj cifara: najširi dostupan ceo broj (64b → 9×10¹⁸)
+#else
+using count = int;          // Broj cifara: kompatibilno s potpisom rmd(int*)
 #endif
 
 class BigDecimal {
