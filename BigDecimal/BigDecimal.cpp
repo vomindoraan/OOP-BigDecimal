@@ -21,7 +21,7 @@ BigDecimal::BigDecimal(int num) :
 {
 	num = std::abs(num);
 	// broj cifara num = ⌊log₁₀(num)⌋ + 1
-	length = dot = (num != 0) ? std::log10(num)+1 : 1;
+	length = dot = (num != 0) ? static_cast<count>(std::log10(num))+1 : 1;
 
 	digits = new digit[length];
 	numToDigits(digits, length, num);
