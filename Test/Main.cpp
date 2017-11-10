@@ -1,7 +1,9 @@
 #include "BigDecimal.h"
 
-#include <iostream>
+#include <fstream>
 #include <ctime>
+
+std::ofstream out;
 
 #if defined PROF_TEST
 void test();
@@ -14,7 +16,7 @@ void test();
 
 void test()
 {
-	std::cout << "from __future__ import print_function\n\n";
+	out << "from __future__ import print_function\n\n";
 
 	const char* raw[] = VALUES;
 	BigDecimal  arr[] = VALUES;
@@ -24,24 +26,28 @@ void test()
 		for (size_t j = 0; j < n; ++j) {
 			auto& a = arr[i];
 			auto& b = arr[j];
-			std::cout << "print((" << a << " + "  << b << ") == " << (a + b)  << ")\n";
-			std::cout << "print((" << a << " - "  << b << ") == " << (a - b)  << ")\n";
-			std::cout << "print((" << a << " < "  << b << ") == " << (a < b)  << ")\n";
-			std::cout << "print((" << a << " > "  << b << ") == " << (a > b)  << ")\n";
-			std::cout << "print((" << a << " == " << b << ") == " << (a == b) << ")\n";
-			std::cout << "print((" << a << " != " << b << ") == " << (a != b) << ")\n";
-			std::cout << "print((" << a << " <= " << b << ") == " << (a <= b) << ")\n";
-			std::cout << "print((" << a << " >= " << b << ") == " << (a >= b) << ")\n";
+			out << "print((" << a << " + "  << b << ") == " << (a + b)  << ")\n";
+			out << "print((" << a << " - "  << b << ") == " << (a - b)  << ")\n";
+			out << "print((" << a << " < "  << b << ") == " << (a < b)  << ")\n";
+			out << "print((" << a << " > "  << b << ") == " << (a > b)  << ")\n";
+			out << "print((" << a << " == " << b << ") == " << (a == b) << ")\n";
+			out << "print((" << a << " != " << b << ") == " << (a != b) << ")\n";
+			out << "print((" << a << " <= " << b << ") == " << (a <= b) << ")\n";
+			out << "print((" << a << " >= " << b << ") == " << (a >= b) << ")\n";
 		}
 }
 #endif  // STUDENT_TEST
 
 int main()
 {
+	out.open("test.py");
 	auto start = std::clock();
 
 	test();
 
 	auto ms = (std::clock() - start) * 1000.0 / CLOCKS_PER_SEC;
-	std::cout << "\nprint('Trajanje: ', " << ms << ", ' ms')\n";
+	out << "\nprint('Trajanje: ', " << ms << ", ' ms')\n";
+	out.close();
+
+	system("python test.py");
 }
