@@ -133,7 +133,7 @@ BigDecimal BigDecimal::shl(count n) const
 	copyDigits(rdigits+zeros, digits, length);
 
 	auto&& result = BigDecimal(sign, rdigits, rlength, 1);
-	delete rdigits;  // Briše pomoćni niz
+	delete[] rdigits;  // Briše pomoćni niz
 	return result;
 }
 
@@ -162,7 +162,7 @@ BigDecimal BigDecimal::shr(count n) const
 		rdigits[rlength] = 0;
 	
 	auto&& result = BigDecimal(sign, rdigits, rlength, rdot);
-	delete rdigits;  // Briše pomoćni niz
+	delete[] rdigits;  // Briše pomoćni niz
 	return result;
 }
 
