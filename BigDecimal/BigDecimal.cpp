@@ -63,7 +63,7 @@ BigDecimal::BigDecimal(const char* num)
 		digits = new digit[length+1];
 		*digits = 0;
 		copyDigits(digits+1, num+1, length);
-		++length, ++dot;  // Uvećava se dužina za tu jednu nulu
+		++length, ++dot;  // Uvećava dužinu za tu jednu nulu
 	} else {
 		digits = new digit[length];
 		copyDigits(digits,     num,       dot);         // Cifre pre tačke
@@ -190,7 +190,40 @@ BigDecimal BigDecimal::rmd(count* n) const
 // Sabira drugi broj sa ovim i vraća zbir kao novi broj
 BigDecimal BigDecimal::add(const BigDecimal* other) const
 {
-	return {};  // TODO
+	count tn, on;
+	auto trmd = this->rmd(&tn), ormd = other->rmd(&on);
+
+	auto n = std::max(tn, on);  // Veći od dva pomeraja udesno
+	auto tshr = trmd.shr(n-tn), oshr = ormd.shr(n-on);
+
+	auto rlength = std::max(tshr.length, oshr.length);
+	auto rdot    = std::max(this->dot,   other->dot);
+	auto rdigits = new digit[rlength];
+	digit carry = 0;
+
+	// Popunjava rezultujući niz sabirajući cifre otpozadi i pamteći prenos
+	for (count t = tshr.length-1, o = oshr.length-1, r = rlength-1;
+	     r >= 0; --t, --o, --r)
+	{
+		auto sum = (t >= 0 ? tshr.digits[t] : 0)
+		         + (o >= 0 ? oshr.digits[o] : 0)
+		         + carry;
+		rdigits[r] = sum % 10;
+		carry      = sum / 10;
+	}
+
+	// Ako je ostao prenos, treba proširiti niz za još jednu cifru
+	if (carry > 0) {
+		auto expanded = new digit[rlength+1];
+		*expanded = carry;  // Prva cifra je prenos
+		copyDigits(expanded+1, rdigits, rlength);  // Ostale se prepisuju
+		++rlength, ++rdot;  // Uvećava dužinu za tu jednu cifru
+		delete[] rdigits, rdigits = expanded;
+	}
+
+	auto&& result = BigDecimal(sign, rdigits, rlength, rlength);
+	delete[] rdigits;
+	return result.shl(rlength - rdot);  // Pomeranje ulevo vraća tačku na mesto
 }
 
 // Oduzima drugi broj od ovog i vraća razliku kao novi broj
