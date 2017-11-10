@@ -224,7 +224,7 @@ BigDecimal BigDecimal::add(const BigDecimal* other) const
 
 	auto&& result = BigDecimal(sign, rdigits, rlength, rlength);
 	delete[] rdigits;
-	return result.shl(rlength - rdot);  // Pomeranje ulevo vraća tačku na mesto
+	return result.shl(n);  // Pomeranje ulevo vraća tačku na mesto
 }
 
 // Oduzima drugi broj od ovog i vraća razliku kao novi broj
